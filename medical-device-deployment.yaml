@@ -1,0 +1,39 @@
+# Mediacal Device Serice [Must be NodePort to exposed only for inner container]
+apiVersion: v1
+kind: Service
+metadata:
+  name: medical-device-service
+spec:
+  selector:
+    app: medical-device
+  ports:
+  - protocol: TCP
+    port: 5695
+    targetPort: 5695
+    nodePort: 31122
+  type: NodePort
+
+# Medical Device Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medical-device-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medical-device
+  template:
+    metadata:
+      labels:
+        app: medical-device
+    spec:
+      containers:
+      - name: medical-device-container
+        # Place the medical-device docker image here
+        image: sanjeev24bhatt/medical-device-microservice:0.3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5695
+        # env-name is used to access env-value in project to call other servies [DNS NAME (must be same as service name)]

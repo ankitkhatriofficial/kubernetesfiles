@@ -1,0 +1,39 @@
+# Security Serice [Must be NodePort to exposed only for inner container]
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-service
+spec:
+  selector:
+    app: security
+  ports:
+  - protocol: TCP
+    port: 8088
+    targetPort: 8088
+    nodePort: 32000
+  type: NodePort
+
+# Security Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: security
+  template:
+    metadata:
+      labels:
+        app: security
+    spec:
+      containers:
+      - name: security-container
+        # Place the security docker image here
+        image: sanjeev24bhatt/security-microservice:0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8088
+        # env-name is used to access env-value in project to call other servies [DNS NAME (must be same as service name)]

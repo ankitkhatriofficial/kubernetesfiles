@@ -1,0 +1,39 @@
+# Config server Serice [Must be NodePort to exposed only for inner container]
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server-service
+spec:
+  selector:
+    app: config-server
+  ports:
+  - protocol: TCP
+    port: 9696
+    targetPort: 9696
+    nodePort: 32638
+  type: NodePort
+
+# Config Server Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-server
+  template:
+    metadata:
+      labels:
+        app: config-server
+    spec:
+      containers:
+      - name: config-server-container
+        # Place the config server docker image here
+        image: sanjeev24bhatt/config-server-microservice:0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9696
+        # env-name is used to access env-value in project to call other servies [DNS NAME (must be same as service name)]

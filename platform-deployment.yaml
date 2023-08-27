@@ -1,0 +1,41 @@
+# PLATFORM Serice [Must be LoadBalancer to exposed to outer container]
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-service
+spec:
+  selector:
+    app: platform
+  ports:
+  - protocol: TCP
+    port: 9999
+    targetPort: 9999
+  type: LoadBalancer
+
+
+# PLATFORM Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-deployment
+  labels:
+    app: platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: platform
+  template:
+    metadata:
+      labels:
+        app: platform
+    spec:
+      containers:
+      - name: platform-container
+        # Place the platform docker image here
+        image: sanjeev24bhatt/platform-microservice:0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9999
+        # env-name is used to access env-value in project to call other servies [DNS NAME (must be same as service name)]

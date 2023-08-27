@@ -1,0 +1,44 @@
+# Nexus Serice [Must be NodePort to exposed only for inner container]
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-service
+spec:
+  selector:
+    app: nexus
+  ports:
+  - protocol: TCP
+    port: 8989
+    targetPort: 8989
+    nodePort: 32130
+  type: NodePort
+
+# Nexus Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      containers:
+      - name: nexus-container
+        # Place the nexus docker image here
+        image: sanjeev24bhatt/nexus-microservice:0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8989
+        # env-name is used to access env-value in project to call other servies [DNS NAME (must be same as service name)]
+        env:
+        - name: spring.mail.username
+          value: bobbykhatri0@gmail.com
+        - name: spring.mail.password
+          value: gwlpmnbdhzefhujl
